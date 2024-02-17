@@ -41,4 +41,6 @@ x64/
 
 build/
 .vscode
+*.pdf
+
 

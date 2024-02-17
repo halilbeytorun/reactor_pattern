@@ -1,0 +1,4 @@
+- Change source files into library and use google test framework.
+- Test LoggingAcceptor to see if it works with InitiationDispatcher using google test.
+
+
