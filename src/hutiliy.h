@@ -1,3 +1,6 @@
+#ifndef hutiliyHeader
+#define hutiliyHeader
+
 #include <iostream>
 #include <type_traits>
 
@@ -61,4 +64,6 @@ void Logger(const Ts& ...args)
 	impl::LoggerImpl(args...);
     std::cout << "\n";
 }
+
+#endif
 

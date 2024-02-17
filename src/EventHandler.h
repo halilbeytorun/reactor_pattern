@@ -1,3 +1,6 @@
+#ifndef EventHandlerHeader
+#define EventHandlerHeader
+
 #include "EventType.h"
 
 
@@ -16,3 +19,4 @@ public:
 
 
 };
+#endif

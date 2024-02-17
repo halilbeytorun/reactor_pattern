@@ -1,3 +1,6 @@
+#ifndef LoggingAcceptorHeader
+#define LoggingAcceptorHeader
+
 #include "EventHandler.h"
 
 
@@ -11,8 +14,9 @@ public:
     int create_server();
     int handle_event(EventType) override;
     int get_handle() override;
-    
+
 private:
     int serverSocket;
 };
 
+#endif

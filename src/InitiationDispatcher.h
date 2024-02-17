@@ -1,3 +1,6 @@
+#ifndef InitiationDispatcherHeader
+#define InitiationDispatcherHeader
+
 #include "EventHandler.h"
 #include "EventType.h"
 
@@ -56,3 +59,5 @@ private:
     InitiationDispatcher() = default;
     InitiationDispatcher(const InitiationDispatcher&) = default;
 };
+
+#endif
