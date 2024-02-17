@@ -39,17 +39,23 @@ public:
     /// @brief Entry point into the reactive event loop.
     void handle_events(int timeout = -1)
     {
-        // TODO need handles to use select.
-        std::vector<pollfd> fd(handlers.size());
-        int counter{};
-
-        for(auto iter = handlers.begin(); iter != handlers.end(); iter++)
+        // the thread that is handling the events.. can have an exit point somehow later
+        while(1)
         {
-            fd[counter].fd = (*iter)->get_handle();
-            fd[counter].events = POLLIN;
-            counter++;
+
+            // TODO need handles to use select.
+            std::vector<pollfd> fd(handlers.size());
+            int counter{};
+
+            for(auto iter = handlers.begin(); iter != handlers.end(); iter++)
+            {
+                fd[counter].fd = (*iter)->get_handle();
+                fd[counter].events = POLLIN;
+                counter++;
+            }
+            // poll(fd.data(), )
+
         }
-        // poll(fd.data(), )
 
     }
 private:
