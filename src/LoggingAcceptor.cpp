@@ -44,7 +44,7 @@ int LoggingAcceptor::create_server()
     }
 
     // Listen for incoming connections
-    if (listen(serverSocket, 3) < 0) {
+    if (listen(serverSocket, 15) < 0) {
         perror("Listen failed");
         return -1;
     }
@@ -75,4 +75,16 @@ int LoggingAcceptor::create_server()
     // Close the sockets
     close(clientSocket);
     close(serverSocket);
+}
+
+
+
+int LoggingAcceptor::handle_event(EventType event_type)
+{
+    return -1;
+}
+
+int LoggingAcceptor::get_handle()
+{
+    return serverSocket;
 }
