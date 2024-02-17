@@ -1,4 +1,6 @@
 #include "LoggingAcceptor.h"
+#include "InitiationDispatcher.h"
+
 
 #include <iostream>
 #include <string>
@@ -16,11 +18,7 @@ LoggingAcceptor::LoggingAcceptor()
 int LoggingAcceptor::create_server()
 {
 
-    int clientSocket;
-    struct sockaddr_in serverAddr, clientAddr;
-    socklen_t clientAddrLen = sizeof(clientAddr);
-    char buffer[1024] = {0};
-
+    struct sockaddr_in  serverAddr;
     // Create a socket
     if ((serverSocket = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
         perror("Socket creation failed");
@@ -50,9 +48,16 @@ int LoggingAcceptor::create_server()
     }
 
     // Acceptor socket creation successfull.
+
+    InitiationDispatcher::getInstance()->register_handler(this, READ_EVENT);
+
     return 0;
 
 
+    int clientSocket;
+    struct sockaddr_in  clientAddr;
+    socklen_t clientAddrLen = sizeof(clientAddr);
+    char buffer[1024] = {0};
 
 
     // TODO delete here after writing handle_event hook method.
@@ -81,7 +86,22 @@ int LoggingAcceptor::create_server()
 
 int LoggingAcceptor::handle_event(EventType event_type)
 {
-    return -1;
+    int clientSocket;
+    struct sockaddr_in  clientAddr;
+    socklen_t clientAddrLen = sizeof(clientAddr);
+    char buffer[1024] = {0};
+
+
+    // TODO delete here after writing handle_event hook method.
+    // Accept incoming connections
+    if ((clientSocket = accept(serverSocket, (struct sockaddr *)&clientAddr, &clientAddrLen)) < 0) {
+        perror("Accept failed");
+        return -1;
+    }
+
+    
+
+    return 0;
 }
 
 int LoggingAcceptor::get_handle()
