@@ -23,6 +23,7 @@ add_executable(${UNIT_NAME}TestTarget ${test_source})
 target_link_libraries(
 ${UNIT_NAME}TestTarget
   GTest::gtest_main
+  ${UNIT_NAME}Target
 )
 
 include(GoogleTest)
