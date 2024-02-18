@@ -9,6 +9,8 @@
 #include <unordered_set>
 #include <vector>
 
+// TODO dtor must delete the handlers, or switching to unique_pointer is needed...
+
 /// @brief Demultiplext and dispatch EventHandlers in response to client requests.
 class InitiationDispatcher
 {
@@ -39,6 +41,7 @@ public:
     /// @brief Entry point into the reactive event loop.
     void handle_events(int timeout = -1)
     {
+        timeout = timeout * 1000;   // switching to seconds...
         // the thread that is handling the events.. can have an exit point somehow later
         while(1)
         {
@@ -53,7 +56,17 @@ public:
                 fd[counter].events = POLLIN;
                 counter++;
             }
-            // poll(fd.data(), )
+            poll(fd.data(), fd.size(), timeout);
+
+            counter = 0;
+            for(auto iter = handlers.begin(); iter != handlers.end(); iter++)
+            {
+                if(POLLIN == fd[counter].revents)
+                {
+                    (*iter)->handle_event(ACCEPT_EVENT);
+                }
+                counter++;
+            }
 
         }
 
