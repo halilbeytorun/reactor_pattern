@@ -26,6 +26,7 @@ public:
     {
         if(handlers.end() == handlers.find(handler))
         {
+            // TODO: Mutex protection from handle_events
             handlers.insert(handler);
             return 0;
         }
