@@ -37,9 +37,14 @@ TEST_F(ProxyClient, LoggingAcceptorTest)
 
     ASSERT_EQ(retval, 0);
 
-    
-    std::thread handlerThread(&InitiationDispatcher::handle_events, InitiationDispatcher::getInstance(), 15);
-    
+    std::atomic<bool> reactor_done(false);
+    std::thread handlerThread([&reactor_done](){
+        while(!reactor_done)
+        {
+            InitiationDispatcher::getInstance()->handle_events(15);
+        }
+
+    });    
 
     int clientSocket;
     struct sockaddr_in serverAddr;
@@ -69,17 +74,16 @@ TEST_F(ProxyClient, LoggingAcceptorTest)
 
     // Send a message to the server
     std::string message = "Hello, server!";
-    Logger(message, " message is sent!");
+    Logger("LoggingAcceptorTest", message, " message is sent!");
     
     if (send(clientSocket, message.c_str(), message.length(), 0) < 0) {
         perror("Send failed");
         return;
     }
 
-    // Close the socket
-    while(1) {}
+    reactor_done = true;
+    handlerThread.join();
     close(clientSocket);
-
 
 
 }

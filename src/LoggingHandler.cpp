@@ -26,7 +26,7 @@ int LoggingHandler::handle_event(EventType)
         return -1;
     }
     buffer[bytesReceived] = '\0';
-    Logger(std::string{buffer}, " message is read");
+    Logger("LoggingHandler::handle_event", std::string{buffer}, " message is read");
 
     return -1;
 }

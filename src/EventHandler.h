@@ -8,6 +8,9 @@
 class EventHandler
 {
 public:
+
+    virtual ~EventHandler() = default;
+
     /// @brief Hook method that is called back by the InitiationDispacher to handle events.
     /// @param  
     /// @return 
