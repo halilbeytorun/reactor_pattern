@@ -16,7 +16,6 @@ int LoggingHandler::get_handle()
 }
 
 
-// TODO implement.
 int LoggingHandler::handle_event(EventType)
 {
         // Read data from the client
@@ -28,5 +27,5 @@ int LoggingHandler::handle_event(EventType)
     buffer[bytesReceived] = '\0';
     Logger("LoggingHandler::handle_event", std::string{buffer}, " message is read");
 
-    return -1;
+    return 0;
 }

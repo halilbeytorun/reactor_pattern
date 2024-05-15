@@ -46,8 +46,8 @@ public:
     void handle_events(int timeout = -1)
     {
         timeout = timeout * 1000;   // switching to seconds...
-        // the thread that is handling the events.. can have an exit point somehow later
 
+        // allowing register/remove handle at the end of each cycle.
         std::lock_guard<std::recursive_mutex> lock(m_rmutex);
         
         std::vector<pollfd> fd(m_handlers.size());
@@ -72,8 +72,6 @@ public:
             }
             counter++;
         }
-        // allowing register/remove handle at the end of each cycle.
-
 
     }
 private:
