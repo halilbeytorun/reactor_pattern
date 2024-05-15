@@ -39,7 +39,7 @@ public:
     int remove_handler(EventHandler* handler, EventType)
     {
         std::lock_guard<std::recursive_mutex> lock(m_rmutex);
-        return m_handlers.erase(handler);
+        return m_handlers.erase(handler) == 1 ? 0 : 1;
     }
 
     /// @brief Entry point into the reactive event loop.
