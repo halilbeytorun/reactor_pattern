@@ -10,7 +10,7 @@
 #include <vector>
 #include <mutex>
 
-// TODO dtor must delete the handlers, or switching to unique_pointer is needed...
+// TODO: is it the best approach to store EventHandlers as raw pointers?
 
 /// @brief Demultiplext and dispatch EventHandlers in response to client requests.
 class InitiationDispatcher
@@ -28,7 +28,6 @@ public:
         std::lock_guard<std::recursive_mutex> lock(m_rmutex);
         if(m_handlers.end() == m_handlers.find(handler))
         {
-            // TODO: Mutex protection from handle_events
             m_handlers.insert(handler);
             return 0;
         }

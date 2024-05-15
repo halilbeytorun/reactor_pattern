@@ -82,7 +82,7 @@ int LoggingAcceptor::handle_event(EventType event_type)
         return -1;
     }
 
-    LoggingHandler* handler = new LoggingHandler(clientSocket); // TODO unique_ptr
+    LoggingHandler* handler = new LoggingHandler(clientSocket);
     
     m_clientHandlers.push_back(handler);
     InitiationDispatcher::getInstance()->register_handler(handler, ACCEPT_EVENT);
