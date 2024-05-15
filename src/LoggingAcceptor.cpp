@@ -57,8 +57,11 @@ int LoggingAcceptor::destroy_server()
 {
     for(auto* range : m_clientHandlers)
     {
+        InitiationDispatcher::getInstance()->remove_handler(range, ACCEPT_EVENT);
         delete range;
     }
+    m_clientHandlers.resize(0);
+    m_clientHandlers.shrink_to_fit();
     close(m_serverSocket);
     return 0;
 }
@@ -80,8 +83,8 @@ int LoggingAcceptor::handle_event(EventType event_type)
     }
 
     LoggingHandler* handler = new LoggingHandler(clientSocket); // TODO unique_ptr
+    
     m_clientHandlers.push_back(handler);
-
     InitiationDispatcher::getInstance()->register_handler(handler, ACCEPT_EVENT);
 
     return 0;
