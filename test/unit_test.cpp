@@ -84,6 +84,7 @@ TEST_F(ProxyClient, LoggingAcceptorTest)
     reactor_done = true;
     handlerThread.join();
     close(clientSocket);
+    acceptor.destroy_server();
 
 
 }
