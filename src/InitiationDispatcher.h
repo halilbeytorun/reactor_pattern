@@ -44,7 +44,7 @@ public:
     /// @brief Entry point into the reactive event loop.
     void handle_events(int timeout = -1)
     {
-        timeout = timeout * 1000;   // switching to seconds...
+        timeout = timeout == -1 ? -1 : timeout * 1000;   // switching to seconds...
 
         // allowing register/remove handle at the end of each cycle.
         std::lock_guard<std::recursive_mutex> lock(m_rmutex);
