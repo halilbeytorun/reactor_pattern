@@ -10,26 +10,26 @@
 #include <unistd.h>
 
 
-LoggingAcceptor::LoggingAcceptor()
+LoggingAcceptor::LoggingAcceptor(std::weak_ptr<InitiationDispatcher> dispatcher) : dispatcher_{std::move(dispatcher)}  
 {
 
 }
 
 
-int LoggingAcceptor::create_server()
+int LoggingAcceptor::CreateServer()
 {
-    Logger("LoggingAcceptor::create_server function is called");
+    Logger("LoggingAcceptor::CreateServer function is called");
     struct sockaddr_in  serverAddr;
     // Create a socket
-    if ((m_serverSocket = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
-        perror("Socket creation failed");
+    if ((server_socket_ = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
+        Logger("LoggingAcceptor::CreateServer Socket creation failed");
         return -1;
     }
 
     // Set socket options
     int opt = 1;
-    if (setsockopt(m_serverSocket, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))) {
-        perror("Setsockopt failed");
+    if (setsockopt(server_socket_, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))) {
+        Logger("LoggingAcceptor::CreateServer: Setsockopt failed");
         return -1;
     }
 
@@ -37,14 +37,14 @@ int LoggingAcceptor::create_server()
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_addr.s_addr = INADDR_ANY;
     serverAddr.sin_port = htons(8080);
-    if (bind(m_serverSocket, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) < 0) {
-        perror("Bind failed");
+    if (bind(server_socket_, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) < 0) {
+        Logger("LoggingAcceptor::CreateServer: Bind failed");
         return -1;
     }
 
     // Listen for incoming connections
-    if (listen(m_serverSocket, 15) < 0) {
-        perror("Listen failed");
+    if (listen(server_socket_, 15) < 0) {
+        Logger("LoggingAcceptor::CreateServer: Listen failed");
         return -1;
     }
 
@@ -53,22 +53,27 @@ int LoggingAcceptor::create_server()
     return 0;
 }
 
-int LoggingAcceptor::destroy_server()
+int LoggingAcceptor::DestroyServer()
 {
-    for(auto* range : m_clientHandlers)
+    for(auto* range : client_handlers_)
     {
-        InitiationDispatcher::getInstance()->remove_handler(range, ACCEPT_EVENT);
+        auto dispatcher_shared = dispatcher_.lock();
+        if(!dispatcher_shared)
+        {
+            throw std::runtime_error{"LoggingAcceptor::DestroyServer, the dispacher is deleted"};
+        }
+        dispatcher_shared->RemoveHandler(range, ACCEPT_EVENT);
         delete range;
     }
-    m_clientHandlers.resize(0);
-    m_clientHandlers.shrink_to_fit();
-    close(m_serverSocket);
+    client_handlers_.resize(0);
+    client_handlers_.shrink_to_fit();
+    close(server_socket_);
     return 0;
 }
 
-int LoggingAcceptor::handle_event(EventType event_type)
+int LoggingAcceptor::HandleEvent(EventType event_type)
 {
-    Logger("LoggingAcceptor::handle_event function is called");
+    Logger("LoggingAcceptor::HandleEvent function is called");
 
     int clientSocket;
     struct sockaddr_in  clientAddr;
@@ -77,20 +82,25 @@ int LoggingAcceptor::handle_event(EventType event_type)
 
 
     // Accept incoming connections
-    if ((clientSocket = accept(m_serverSocket, (struct sockaddr *)&clientAddr, &clientAddrLen)) < 0) {
-        perror("Accept failed");
+    if ((clientSocket = accept(server_socket_, (struct sockaddr *)&clientAddr, &clientAddrLen)) < 0) {
+        Logger("Accept failed");
         return -1;
     }
 
     LoggingHandler* handler = new LoggingHandler(clientSocket);
     
-    m_clientHandlers.push_back(handler);
-    InitiationDispatcher::getInstance()->register_handler(handler, ACCEPT_EVENT);
+    client_handlers_.push_back(handler);
+    auto dispatcher_shared = dispatcher_.lock();
+    if(!dispatcher_shared)
+    {
+        throw std::runtime_error{"LoggingAcceptor::DestroyServer, the dispacher is deleted"};
+    }    
+    dispatcher_shared->RegisterHandler(handler, ACCEPT_EVENT);
 
     return 0;
 }
 
-int LoggingAcceptor::get_handle()
+int LoggingAcceptor::GetHandle()
 {
-    return m_serverSocket;
+    return server_socket_;
 }

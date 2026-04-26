@@ -14,11 +14,11 @@ public:
     /// @brief Hook method that is called back by the InitiationDispacher to handle events.
     /// @param  
     /// @return 
-    virtual int handle_event(EventType) = 0;
+    virtual int HandleEvent(EventType) = 0;
     
     /// @brief Hook method that returns the underlying I/0 Handle.
     /// @return Handle
-    virtual int get_handle() = 0;
+    virtual int GetHandle() = 0;
 
 
 };

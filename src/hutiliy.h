@@ -66,4 +66,3 @@ void Logger(const Ts& ...args)
 }
 
 #endif
-

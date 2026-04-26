@@ -14,6 +14,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <memory>
 
 
 void serverConnection(int threadNumber)
@@ -72,20 +73,21 @@ protected:
 
 TEST_F(ProxyClient, LoggingAcceptorTest)
 {
-    LoggingAcceptor acceptor{};
-    auto retval = acceptor.create_server();
+    auto init_dispatcher =  std::make_shared<InitiationDispatcher>();
+    LoggingAcceptor acceptor{init_dispatcher};
+    auto retval = acceptor.CreateServer();
 
     ASSERT_EQ(retval, 0);
 
-    retval = InitiationDispatcher::getInstance()->register_handler(&acceptor, ACCEPT_EVENT);
+    retval = init_dispatcher->RegisterHandler(&acceptor, ACCEPT_EVENT);
 
     ASSERT_EQ(retval, 0);
 
     std::atomic<bool> reactor_done(false);
-    std::thread handlerThread([&reactor_done](){
+    std::thread handler_thread([&](){
         while(!reactor_done)
         {
-            InitiationDispatcher::getInstance()->handle_events(15);
+            init_dispatcher->HandleEvents(15);
         }
 
     });    
@@ -93,32 +95,32 @@ TEST_F(ProxyClient, LoggingAcceptorTest)
     serverConnection(1);
 
     reactor_done = true;
-    handlerThread.join();
-    acceptor.destroy_server();
+    handler_thread.join();
+    acceptor.DestroyServer();
 
-    retval = InitiationDispatcher::getInstance()->remove_handler(&acceptor, ACCEPT_EVENT);
+    retval = init_dispatcher->RemoveHandler(&acceptor, ACCEPT_EVENT);
     ASSERT_EQ(retval, 0);
-
 }
 
 
 
 TEST_F(ProxyClient, LoggingAcceptorMultipleClientsTest)
 {
-    LoggingAcceptor acceptor{};
-    auto retval = acceptor.create_server();
+    auto init_dispatcher =  std::make_shared<InitiationDispatcher>();
+    LoggingAcceptor acceptor{init_dispatcher};
+    auto retval = acceptor.CreateServer();
 
     ASSERT_EQ(retval, 0);
 
-    retval = InitiationDispatcher::getInstance()->register_handler(&acceptor, ACCEPT_EVENT);
+    retval = init_dispatcher->RegisterHandler(&acceptor, ACCEPT_EVENT);
 
     ASSERT_EQ(retval, 0);
 
     std::atomic<bool> reactor_done(false);
-    std::thread handlerThread([&reactor_done](){
+    std::thread handler_thread([&](){
         while(!reactor_done)
         {
-            InitiationDispatcher::getInstance()->handle_events(15);
+            init_dispatcher->HandleEvents(15);
         }
 
     });
@@ -136,10 +138,8 @@ TEST_F(ProxyClient, LoggingAcceptorMultipleClientsTest)
         t.join();
     }
 
-
-
     reactor_done = true;
-    handlerThread.join();
-    acceptor.destroy_server();
+    handler_thread.join();
+    acceptor.DestroyServer();
 
 }

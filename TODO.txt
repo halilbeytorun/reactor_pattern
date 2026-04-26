@@ -1,3 +1,4 @@
+- Create class UML diagram into md file.
 - Test InitiationDispatcher, Logging Handler, LoggingAcceptor more
 - Treat InitiationDispatcher independent from EventHandlers
 - Create individual SynchronousEventDemultiplexer to handle select operations

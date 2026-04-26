@@ -7,15 +7,14 @@
 class LoggingHandler : public EventHandler
 {
 public:
-    explicit LoggingHandler(int _clientSocket);
+    explicit LoggingHandler(int client_socket);
     ~LoggingHandler();
-    int handle_event(EventType) override;
-    int get_handle() override;
-
+    int HandleEvent(EventType) override;
+    int GetHandle() override;
 private:
-    int m_clientSocket{};
-    char buffer[1024]{};
-    bool m_socketClosed{};
+    int client_socket_{};
+    char buffer_[1024]{};
+    bool socket_closed_{};
 };
 
 

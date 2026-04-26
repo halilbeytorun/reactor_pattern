@@ -5,39 +5,38 @@
 #include <cstdio>
 #include <iostream>
 
-LoggingHandler::LoggingHandler(int _clientSocket) : m_clientSocket(_clientSocket), m_socketClosed(false)
+LoggingHandler::LoggingHandler(int client_socket) : client_socket_(client_socket), socket_closed_(false)
 {
 
 }
 LoggingHandler::~LoggingHandler()
 {
-    if(!m_socketClosed)
-        close(m_clientSocket);
+    if(!socket_closed_)
+        close(client_socket_);
 }
 
-int LoggingHandler::get_handle()
+int LoggingHandler::GetHandle()
 {
-    return m_clientSocket;
+    return client_socket_;
 }
 
 
-int LoggingHandler::handle_event(EventType)
+int LoggingHandler::HandleEvent(EventType)
 {
-        // Read data from the client
-    int bytesReceived = read(m_clientSocket, buffer, sizeof(buffer));
-    if (bytesReceived < 0) {
-        perror("Read failed");
+    int received_byte_number = read(client_socket_, buffer_, sizeof(buffer_));
+    if (received_byte_number < 0) {
+        Logger("LoggingHandler::HandleEvent: Read failed");
         return -1;
     }
-    else if(0 == bytesReceived) // Connection closed --> Action needed.
+    else if(0 == received_byte_number) // Connection closed --> Action needed.
     {
-        close(m_clientSocket);
-        m_socketClosed = true;
-        Logger("LoggingHandler::handle_event client socket is closed from server side!");
+        close(client_socket_);
+        socket_closed_ = true;
+        Logger("LoggingHandler::HandleEvent client socket is closed from server side!");
         return 0;
     }
-    buffer[bytesReceived] = '\0';
-    Logger("LoggingHandler::handle_event", std::string{buffer}, " message is read");
+    buffer_[received_byte_number] = '\0';
+    Logger("LoggingHandler::HandleEvent", std::string{buffer_}, " message is read");
 
     return 0;
 }

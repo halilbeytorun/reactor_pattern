@@ -4,23 +4,25 @@
 #include "EventHandler.h"
 
 #include <vector>
+#include <memory>
 
 class LoggingHandler;
+class InitiationDispatcher;
 
 class LoggingAcceptor : public EventHandler
 {
 public:
-    
     /// @brief Constructor is responsible for socket creation, dtor is for destroying the socket.
-    LoggingAcceptor();
-    int create_server();
-    int destroy_server();
-    int handle_event(EventType) override;
-    int get_handle() override;
+    LoggingAcceptor(std::weak_ptr<InitiationDispatcher>);
+    int CreateServer();
+    int DestroyServer();
+    int HandleEvent(EventType) override;
+    int GetHandle() override;
 
 private:
-    int m_serverSocket;
-    std::vector<LoggingHandler*> m_clientHandlers;  // LoggingAcceptor is responsible for them.
+    std::weak_ptr<InitiationDispatcher> dispatcher_;
+    int server_socket_;
+    std::vector<LoggingHandler*> client_handlers_;  // LoggingAcceptor is responsible for them.
 };
 
 #endif
