@@ -7,22 +7,22 @@
 #include <memory>
 
 class LoggingHandler;
-class InitiationDispatcher;
+class IInitiationDispatcher;
 
 class LoggingAcceptor : public EventHandler
 {
 public:
     /// @brief Constructor is responsible for socket creation, dtor is for destroying the socket.
-    LoggingAcceptor(std::weak_ptr<InitiationDispatcher>);
+    LoggingAcceptor(std::weak_ptr<IInitiationDispatcher>);
     int CreateServer();
     int DestroyServer();
     int HandleEvent(EventType) override;
     int GetHandle() override;
 
 private:
-    std::weak_ptr<InitiationDispatcher> dispatcher_;
+    std::weak_ptr<IInitiationDispatcher> dispatcher_;
     int server_socket_;
-    std::vector<LoggingHandler*> client_handlers_;  // LoggingAcceptor is responsible for them.
+    std::vector<std::shared_ptr<LoggingHandler>> client_handlers_;  // LoggingAcceptor is responsible for them.
 };
 
 #endif

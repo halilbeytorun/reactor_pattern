@@ -1,5 +1,5 @@
 #include "LoggingAcceptor.h"
-#include "InitiationDispatcher.h"
+#include "IInitiationDispatcher.h"
 #include "LoggingHandler.h"
 #include "hutiliy.h"
 
@@ -10,7 +10,7 @@
 #include <unistd.h>
 
 
-LoggingAcceptor::LoggingAcceptor(std::weak_ptr<InitiationDispatcher> dispatcher) : dispatcher_{std::move(dispatcher)}  
+LoggingAcceptor::LoggingAcceptor(std::weak_ptr<IInitiationDispatcher> dispatcher) : dispatcher_{std::move(dispatcher)}  
 {
 
 }
@@ -55,15 +55,14 @@ int LoggingAcceptor::CreateServer()
 
 int LoggingAcceptor::DestroyServer()
 {
-    for(auto* range : client_handlers_)
+    for(auto client_handle : client_handlers_)
     {
         auto dispatcher_shared = dispatcher_.lock();
         if(!dispatcher_shared)
         {
             throw std::runtime_error{"LoggingAcceptor::DestroyServer, the dispacher is deleted"};
         }
-        dispatcher_shared->RemoveHandler(range, ACCEPT_EVENT);
-        delete range;
+        dispatcher_shared->RemoveHandler(client_handle, ACCEPT_EVENT);
     }
     client_handlers_.resize(0);
     client_handlers_.shrink_to_fit();
@@ -87,9 +86,9 @@ int LoggingAcceptor::HandleEvent(EventType event_type)
         return -1;
     }
 
-    LoggingHandler* handler = new LoggingHandler(clientSocket);
+    auto handler = std::make_shared<LoggingHandler>(clientSocket);
     
-    client_handlers_.push_back(handler);
+    client_handlers_.push_back(handler);    // TODO: Think about lifetime and ownership!
     auto dispatcher_shared = dispatcher_.lock();
     if(!dispatcher_shared)
     {

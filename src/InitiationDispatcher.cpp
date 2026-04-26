@@ -1,7 +1,7 @@
 #include "InitiationDispatcher.h"
 #include <poll.h>
 
-int InitiationDispatcher::RegisterHandler(EventHandler* handler, EventType)
+int InitiationDispatcher::RegisterHandler(std::shared_ptr<EventHandler> handler, EventType)
 {
     std::lock_guard<std::recursive_mutex> lock(rmutex_);
     if(event_handlers_.end() == event_handlers_.find(handler))
@@ -12,7 +12,7 @@ int InitiationDispatcher::RegisterHandler(EventHandler* handler, EventType)
     return -1;
 }
 
-int InitiationDispatcher::RemoveHandler(EventHandler* handler, EventType)
+int InitiationDispatcher::RemoveHandler(std::shared_ptr<EventHandler> handler, EventType)
 {
     std::lock_guard<std::recursive_mutex> lock(rmutex_);
     return event_handlers_.erase(handler) == 1 ? 0 : 1;
@@ -26,7 +26,7 @@ void InitiationDispatcher::HandleEvents(int timeout)
     std::lock_guard<std::recursive_mutex> lock(rmutex_);
     
     std::vector<pollfd> fd(event_handlers_.size());
-    std::vector<EventHandler*> handlers(event_handlers_.size());
+    std::vector<std::shared_ptr<EventHandler>> handlers(event_handlers_.size());
     
     int counter{};
     for(auto iter = event_handlers_.begin(); iter != event_handlers_.end(); iter++)

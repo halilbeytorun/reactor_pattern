@@ -74,12 +74,12 @@ protected:
 TEST_F(ProxyClient, LoggingAcceptorTest)
 {
     auto init_dispatcher =  std::make_shared<InitiationDispatcher>();
-    LoggingAcceptor acceptor{init_dispatcher};
-    auto retval = acceptor.CreateServer();
+    auto acceptor = std::make_shared<LoggingAcceptor>(init_dispatcher);
+    auto retval = acceptor->CreateServer();
 
     ASSERT_EQ(retval, 0);
 
-    retval = init_dispatcher->RegisterHandler(&acceptor, ACCEPT_EVENT);
+    retval = init_dispatcher->RegisterHandler(acceptor, ACCEPT_EVENT);
 
     ASSERT_EQ(retval, 0);
 
@@ -96,9 +96,9 @@ TEST_F(ProxyClient, LoggingAcceptorTest)
 
     reactor_done = true;
     handler_thread.join();
-    acceptor.DestroyServer();
+    acceptor->DestroyServer();
 
-    retval = init_dispatcher->RemoveHandler(&acceptor, ACCEPT_EVENT);
+    retval = init_dispatcher->RemoveHandler(acceptor, ACCEPT_EVENT);
     ASSERT_EQ(retval, 0);
 }
 
@@ -107,12 +107,12 @@ TEST_F(ProxyClient, LoggingAcceptorTest)
 TEST_F(ProxyClient, LoggingAcceptorMultipleClientsTest)
 {
     auto init_dispatcher =  std::make_shared<InitiationDispatcher>();
-    LoggingAcceptor acceptor{init_dispatcher};
-    auto retval = acceptor.CreateServer();
+    auto acceptor = std::make_shared<LoggingAcceptor>(init_dispatcher);
+    auto retval = acceptor->CreateServer();
 
     ASSERT_EQ(retval, 0);
 
-    retval = init_dispatcher->RegisterHandler(&acceptor, ACCEPT_EVENT);
+    retval = init_dispatcher->RegisterHandler(acceptor, ACCEPT_EVENT);
 
     ASSERT_EQ(retval, 0);
 
@@ -140,6 +140,6 @@ TEST_F(ProxyClient, LoggingAcceptorMultipleClientsTest)
 
     reactor_done = true;
     handler_thread.join();
-    acceptor.DestroyServer();
+    acceptor->DestroyServer();
 
 }
