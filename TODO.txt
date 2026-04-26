@@ -1,4 +1,6 @@
 - Create class UML diagram into md file.
+- Review the tests and maybe extend them. --> Human eyes
+- Update the Readme
+- EventType, make it something useful
 - Test InitiationDispatcher, Logging Handler, LoggingAcceptor more
-- Treat InitiationDispatcher independent from EventHandlers
 - Create individual SynchronousEventDemultiplexer to handle select operations
